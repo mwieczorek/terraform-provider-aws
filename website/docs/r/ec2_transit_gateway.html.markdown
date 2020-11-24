@@ -30,6 +30,7 @@ The following arguments are supported:
 * `dns_support` - (Optional) Whether DNS support is enabled. Valid values: `disable`, `enable`. Default value: `enable`.
 * `tags` - (Optional) Key-value tags for the EC2 Transit Gateway.
 * `vpn_ecmp_support` - (Optional) Whether VPN Equal Cost Multipath Protocol support is enabled. Valid values: `disable`, `enable`. Default value: `enable`.
+* `multicast_support` - (Optional) Whether to enable creating multicast domains in the Transit Gateway. Valid values: `disable`, `enable`. Default value: `disable`. Update of this value will recreate Transit Gateway.
 
 ## Attributes Reference
 

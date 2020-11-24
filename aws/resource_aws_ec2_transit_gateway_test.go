@@ -405,6 +405,39 @@ func TestAccAWSEc2TransitGateway_VpnEcmpSupport(t *testing.T) {
 	})
 }
 
+func TestAccAWSEc2TransitGateway_MulticastSupport(t *testing.T) {
+	var transitGateway1, transitGateway2 ec2.TransitGateway
+	resourceName := "aws_ec2_transit_gateway.test"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t); testAccPreCheckAWSEc2TransitGateway(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckAWSEc2TransitGatewayDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccAWSEc2TransitGatewayConfigMulticastSupport(ec2.MulticastSupportValueEnable),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckAWSEc2TransitGatewayExists(resourceName, &transitGateway1),
+					resource.TestCheckResourceAttr(resourceName, "multicast_support", ec2.MulticastSupportValueEnable),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			{
+				Config: testAccAWSEc2TransitGatewayConfigMulticastSupport(ec2.MulticastSupportValueDisable),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckAWSEc2TransitGatewayExists(resourceName, &transitGateway2),
+					testAccCheckAWSEc2TransitGatewayRecreated(&transitGateway1, &transitGateway2),
+					resource.TestCheckResourceAttr(resourceName, "multicast_support", ec2.MulticastSupportValueDisable),
+				),
+			},
+		},
+	})
+}
+
 func TestAccAWSEc2TransitGateway_Description(t *testing.T) {
 	var transitGateway1, transitGateway2 ec2.TransitGateway
 	resourceName := "aws_ec2_transit_gateway.test"
@@ -725,6 +758,14 @@ resource "aws_ec2_transit_gateway" "test" {
   vpn_ecmp_support = %q
 }
 `, vpnEcmpSupport)
+}
+
+func testAccAWSEc2TransitGatewayConfigMulticastSupport(multicastSupport string) string {
+	return fmt.Sprintf(`
+resource "aws_ec2_transit_gateway" "test" {
+  multicast_support = %q
+}
+`, multicastSupport)
 }
 
 func testAccAWSEc2TransitGatewayConfigDescription(description string) string {
